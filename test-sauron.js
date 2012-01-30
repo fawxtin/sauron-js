@@ -26,7 +26,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
         }
 
     },
-    'A Simple Promisse': {
+    'A Simple Event': {
         topic: new(sauron.base),
 
         'if red is red, red is blue': function (base) {
@@ -49,16 +49,16 @@ vows.describe('The Eye Who Sees Everything').addBatch({
             assert.equal (base.ask(['fruit', 'sweet', 'red']), 'strawberry');
         }
     },
-    'A Multiple Promisse': {
+    'A Multiple Event': {
         topic: new(sauron.base),
 
-        '"fruit" and "red", set "apple", but promisse returning "coconut" if its an apple': function (base) {
+        '"fruit" and "red", set "apple", but event returning "coconut" if its an apple': function (base) {
 	    base.say(['fruit', 'red'], 'apple');
 	    base.say(['fruit', 'red'], 'function anon_fn(y, x) { if (x === \'apple\') { return \'coconut\'; } else { return x; } }', true);
             assert.equal (base.ask(['fruit', 'red']), 'coconut');
         }
     },
-    'A Simple Comunication Promisse case': {
+    'A Simple Comunication Event case': {
         topic: new(sauron.base),
 
         'when asked for "Osvaldo", let "Taylor" know about it': function (base) {
@@ -68,7 +68,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 	    assert.equal (base.ask(['taylor', 'about', 'osvaldo']), 'ok');
         }
     },
-    'A Message Comunication Promisse case': {
+    'A Message Comunication Event case': {
         topic: new(sauron.base),
 
         'when asked for "orange", let "Manuel" know who wants and how many': function (base) {

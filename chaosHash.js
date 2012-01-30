@@ -4,6 +4,8 @@
 
 var fs = require('fs');
 
+// TODO: implement an data._history, to track data history changes
+
 
 function chaosHash() {
     this.data = {};
@@ -18,7 +20,7 @@ function chaosHash() {
 		if (!obj[key])
 		    obj[key] = {};
 		if (count === keys.length) {
-		    obj[key].value = value;
+		    obj[key]._value = value;
 		} else {
 		    obj = obj[key];
 		    count += 1;
@@ -28,7 +30,7 @@ function chaosHash() {
 	default:
 	    if (!this.data[keys])
 		this.data[keys] = {};
-	    this.data[keys].value = value;
+	    this.data[keys]._value = value;
 	    break;
 	}
     };
@@ -43,7 +45,7 @@ function chaosHash() {
 		if (!obj[key])
 		    return undefined;
 		if (count === keys.length) {
-		    return obj[key].value;
+		    return obj[key]._value;
 		} else {
 		    obj = obj[key];
 		    count += 1;
@@ -53,7 +55,7 @@ function chaosHash() {
 	default:
 	    if (!this.data[keys])
 		this.data[keys] = {};
-	    return this.data[keys].value;
+	    return this.data[keys]._value;
 	    break;
 	}
     };

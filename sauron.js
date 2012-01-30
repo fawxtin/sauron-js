@@ -53,10 +53,10 @@ var functionCell = function(context) {
 var base = function() {
     this.data = new(chaosHash);
     this.data_fn = new(chaosHash);
-    this.say = function(what, answer, promisse) {
+    this.say = function(what, answer, event) {
 	if (!this.data_fn.get(what))
 	    this.data_fn.set(what, new functionCell({'sauron': this}));
-	if (promisse == true) {
+	if (event == true) {
 	    this.data_fn.set(what, this.data_fn.get(what).setCell(answer));
 	} else {
 	    this.data.set(what, this.data_fn.get(what).getFn()('say', answer));
