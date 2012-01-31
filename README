@@ -1,5 +1,5 @@
 
 sauron-js is an event driven hash like database, in the sense that is possible
-to attach functions to a given hash cell.
+to attach functions (triggers) to a given hash cell.
 
 

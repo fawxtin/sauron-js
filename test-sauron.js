@@ -1,5 +1,7 @@
 var vows = require('vows'),
-    assert = require('assert');
+    assert = require('assert'),
+    JSON = require('JSON'),
+    fs = require('fs');
 
 var sauron = require('./sauron');
 
@@ -88,6 +90,80 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 	    base.say(['fruits', 'orange'], '(cyntia, 3)');
 	    assert.equal (base.ask(['fruits', 'Manuel', 'orange']), '(jack, 5),(cyntia, 3)');
         }
+    },
+    'Persistence cases on Data only': {
+    	topic: new(sauron.base),
+    	'Using the sauron generic base' : {
+    	    topic: function (base) {
+    		base.say('one', '1');
+    		return base;
+    	    },
+    	    'When "one" is "1"': {
+    		topic: function (base) {
+		    var that = this;
+    		    base.saveData('test_persistence_simple.data', function () {
+				      var baseB = new(sauron.base);
+				      baseB.loadData('test_persistence_simple.data', that.callback);
+				 });
+    		},
+    		'Let it save and then load simple data': function () {
+		    var base = this;
+		    assert.isObject(base);
+    		    assert.equal(base.ask('one'), '1');
+    		}
+    	    }
+    	}
+    },
+    'Persistence complex cases on Data only': {
+    	topic: new(sauron.base),
+    	'Using the sauron generic base' : {
+    	    topic: function (base) {
+    		base.say('one', '1');
+    		base.say('two', '2');
+    		base.say(['fruits', 'grape'], 'purple');
+    		return base;
+    	    },
+    	    'When "one" is "1", "two" is "2", and ["fruits", "grape"] is "purple"': {
+    		topic: function (base) {
+		    var that = this;
+    		    base.saveData('test_persistence_complex.data', function () {
+				      var baseB = new(sauron.base);
+				      baseB.loadData('test_persistence_complex.data', that.callback);
+				 });
+    		},
+    		'Let it save and then load complex data': function () {
+		    var base = this;
+		    assert.isObject(base);
+    		    assert.equal(base.ask('one'), '1');
+    		    assert.equal(base.ask('two'), '2');
+    		    assert.equal(base.ask(['fruits', 'grape']), 'purple');
+    		}
+    	    }
+    	}
+    },
+    'Persistence cases on Data_fn only': {
+    	topic: new(sauron.base),
+    	'Using the sauron generic base' : {
+    	    topic: function (base) {
+    		base.say('8', 'function square (act, x) { return x*x; }', true);
+    		return base;
+    	    },
+    	    'When "8" has an event': {
+    		topic: function (base) {
+		    var that = this;
+    		    base.saveDataFn('test_persistence_simple.data_fn', function () {
+					var baseB = new(sauron.base);
+					baseB.say('8', 8);
+					baseB.loadDataFn('test_persistence_simple.data_fn', that.callback);
+				 });
+    		},
+    		'Let it save and then load function data': function () {
+		    var base = this;
+		    assert.isObject(base);
+    		    assert.equal(base.ask('8'), 64);
+    		}
+    	    }
+    	}
     }
 
 }).export(module);
