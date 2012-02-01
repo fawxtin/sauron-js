@@ -105,7 +105,7 @@ var base = function() {
 			if (err) throw err;
 			that.data.copy(JSON.parse(fdata));
 			console.log('[ info ] loading \'data\' content from: ' + filename);
-			callback.call(that);
+			callback(that);
 		    });
     };
 
@@ -115,7 +115,7 @@ var base = function() {
 			if (err) throw err;
 			that.data_fn.copy(parse_data_fn(that, JSON.parse(fdata)));
 			console.log('[ info ] loading \'data_fn\' content from: ' + filename);
-			callback.call(that);
+			callback(that);
 		    });
     };
 
@@ -124,7 +124,7 @@ var base = function() {
 	fs.writeFile(filename, JSON.stringify(that.data.data, null, 4), function (err) {
 			 if (err) throw err;
 			 console.log('[ info ] saved \'data\' content at: ' + filename);
-			 callback.call(that);
+			 callback(that);
 		     });
     };
 
@@ -133,7 +133,7 @@ var base = function() {
 	fs.writeFile(filename, JSON.stringify(parse_data_fn(that, that.data_fn.data), null, 4), function (err) {
 			 if (err) throw err;
 			 console.log('[ info ] saved \'data_fn\' content at: ' + filename);
-			 callback.call(that);
+			 callback(that);
 		     });
     };
 };

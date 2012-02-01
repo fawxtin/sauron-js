@@ -103,7 +103,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 		    var that = this;
     		    base.saveData('test_persistence_simple.data', function () {
 				      var baseB = new(sauron.base);
-				      baseB.loadData('test_persistence_simple.data', that.callback);
+				      baseB.loadData('test_persistence_simple.data', function (data) { that.callback.call(data); });
 				 });
     		},
     		'Let it save and then load simple data': function () {
@@ -128,7 +128,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 		    var that = this;
     		    base.saveData('test_persistence_complex.data', function () {
 				      var baseB = new(sauron.base);
-				      baseB.loadData('test_persistence_complex.data', that.callback);
+				      baseB.loadData('test_persistence_complex.data', function (data) { that.callback.call(data); });
 				 });
     		},
     		'Let it save and then load complex data': function () {
@@ -154,7 +154,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
     		    base.saveDataFn('test_persistence_simple.data_fn', function () {
 					var baseB = new(sauron.base);
 					baseB.say('8', 8);
-					baseB.loadDataFn('test_persistence_simple.data_fn', that.callback);
+					baseB.loadDataFn('test_persistence_simple.data_fn', function (data) { that.callback.call(data); });
 				 });
     		},
     		'Let it save and then load function data': function () {
