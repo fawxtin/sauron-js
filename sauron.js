@@ -11,7 +11,7 @@ var fs = require('fs');
 
 var functionCell = function(context) {
     this.context = context; // shall be {'sauron': this}
-    this.cell = [null, ['function (action, x) { return x; }']];
+    this.cell = [null, ['function (x, action, oldValue) { return x; }']];
 
     this.getCodes = function() { return this.cell[1]; };
     this.generateFn = function(code) {
@@ -40,7 +40,7 @@ var functionCell = function(context) {
 	    this.cell[0] = fn;
 	else {
 	    var fn2 = this.getFn();
-	    this.cell[0] = function (y, x) { return fn(y, fn2(y, x)); };
+	    this.cell[0] = function (x, y) { return fn(fn2(x, y), y); };
 	}
     };
     this.addCode = function(code) {
@@ -63,7 +63,7 @@ var parse_data_fn = function(this_sauron, data) {
 		    codes = data._value;
 		    res._value = new functionCell({'sauron': this_sauron});
 		    for (var _k in codes) if (codes.hasOwnProperty(_k)) {
-			if (codes[_k] != 'function (action, x) { return x; }')
+			if (codes[_k] != 'function (x, action, oldValue) { return x; }')
 			    res._value.addCode(codes[_k]);
 		    }
 		}
@@ -80,6 +80,18 @@ var parse_data_fn = function(this_sauron, data) {
 };
 
 var base = function() {
+    /*
+     * TODO: apply the concept of one function per cell,
+     * similar to the CLOS concept with before, after and
+     * around closures, beyond the primary event which
+     * will not be composed. Example:
+     * 
+     * keys: A, B, C
+     * sequence: before-A, before-B, before-C, primary-C, after-A, after-B, after-C
+     * 
+     * Around uses call-next-method to keep the sequence going, 
+     * dont know yet how to implement it properly.
+     */
     this.data = new(chaosHash);
     this.data_fn = new(chaosHash);
     this.say = function(what, answer, event) {
@@ -88,14 +100,22 @@ var base = function() {
 	if (event == true) {
 	    this.data_fn.set(what, this.data_fn.get(what).setCell(answer));
 	} else {
-	    this.data.set(what, this.data_fn.get(what).getFn()('say', answer));
+	    this.data.set(what, this.data_fn.get(what).getFn()(answer, 'say', this.data.get(what)));
 	}
+    };
+
+    this.dataToJSON() = function () {
+	// TODO
+    };
+
+    this.dataFnToJSON() = function () {
+	// TODO
     };
 
     this.ask = function(what) {
 	if (!this.data_fn.get(what))
 	    this.data_fn.set(what, new functionCell({'sauron': this}));
-	return this.data_fn.get(what).getFn()('ask', this.data.get(what));
+	return this.data_fn.get(what).getFn()(this.data.get(what), 'ask');
     };
 
     // TODO: load
@@ -140,3 +160,4 @@ var base = function() {
 
 exports.base = base;
 exports.functionCell = functionCell;
+exports.parse_data_fn = parse_data_fn;
