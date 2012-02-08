@@ -12,40 +12,41 @@ var hashish = require('hashish');
 
 var functionCell = function(context) {
     this.context = context; // shall be {'sauron': this}
-    this.cell = [null, ['function (x, action, value) { return x; }']];
+    this.cell = {fn: {before: null, after: null, primary: null},
+		 code: {before: 'function (x, action, value) { return x; }', 
+			after: 'function (x, action, value) { return x; }',
+			primary: 'function (x, action, value) { return x; }'}};
 
-    this.getCodes = function() { return this.cell[1]; };
+    this.getCode = function(type) { return this.cell.code[type]; };
     this.generateFn = function(code) {
 	with (context) { 
 	    var fn = eval('(' + code + ')'); 
 	}
 	return fn;
     };
-    this.getFn = function() { 
-	if (this.cell[0] == null) {
-	    var codes = this.getCodes();
-	    for (var _i in codes) if (codes.hasOwnProperty(_i)) {
-		var code = codes[_i];
-		this.setFn(this.generateFn(code));
-	    }
+    this.getFn = function(type) { 
+	if (this.cell.fn[type] == null) {
+	    var code = this.getCode(type);
+	    this.setFn(type, this.generateFn(code));
 	}
-	return this.cell[0];
+	return this.cell.fn[type];
     };
-    this.setCell = function (code) {
-	this.setFn(this.generateFn(code));
-	this.addCode(code);
+    this.setFn = function (type, fn) {
+	this.cell.fn[type] = fn;
+    };
+    this.setCode = function(type, code) {
+	this.cell.code[type] = code;
+    };
+    this.getCodes = function() {
+	return this.cell.code;
+    };
+    this.setCodes = function(codes) {
+	this.cell.code = codes;
+    };
+    this.setCell = function (type, code) {
+	this.setFn(type, this.generateFn(code));
+	this.setCode(type, code);
 	return this;
-    };
-    this.setFn = function (fn) {
-	if (this.cell[0] == null)
-	    this.cell[0] = fn;
-	else {
-	    var fn2 = this.getFn();
-	    this.cell[0] = function (x, y) { return fn(fn2(x, y), y); };
-	}
-    };
-    this.addCode = function(code) {
-	this.cell[1].push(code);
     };
 
     return this;
@@ -58,15 +59,13 @@ var parse_data_fn = function(this_sauron, data) {
 	var res = {};
 	for (var _j in data) if (data.hasOwnProperty(_j)) {
 	    if (_j === '_value') { // Critic part
-		if (Object.prototype.toString.call(data._value) === '[object Object]') { // On saving
+		// TODO: redo
+		if (data._value.cell != undefined) { // On saving
 		    res._value = data._value.getCodes();
-		} else if (Object.prototype.toString.call(data._value) === '[object Array]') { // On loading
+		} else { // On loading
 		    codes = data._value;
 		    res._value = new functionCell({'sauron': this_sauron});
-		    for (var _k in codes) if (codes.hasOwnProperty(_k)) {
-			if (codes[_k] != 'function (x, action, value) { return x; }')
-			    res._value.addCode(codes[_k]);
-		    }
+		    res._value.setCodes(codes);
 		}
 	    } else 
 		res[_j] = parse_data_fn(this_sauron, data[_j]);
@@ -83,7 +82,7 @@ var parse_data_fn = function(this_sauron, data) {
 var base = function() {
     /*
      * TODO: apply the concept of one function per cell,
-     * similar to the CLOS concept with before, after and
+     * similar to the Lisp CLOS concept with before, after and
      * around closures, beyond the primary event which
      * will not be composed. Example:
      * 
@@ -98,10 +97,10 @@ var base = function() {
     this.say = function(what, answer, event) {
 	if (!this.data_fn.get(what))
 	    this.data_fn.set(what, new functionCell({'sauron': this}));
-	if (event == true) {
-	    this.data_fn.set(what, this.data_fn.get(what).setCell(answer));
+	if (event) {
+	    this.data_fn.set(what, this.data_fn.get(what).setCell(event, answer));
 	} else {
-	    this.data.set(what, this.data_fn.get(what).getFn()(answer, 'say', this.data.get(what)));
+	    this.data.set(what, this.data_fn.get(what).getFn('primary')(answer, 'say', this.data.get(what)));
 	}
     };
 
@@ -116,7 +115,7 @@ var base = function() {
     this.ask = function(what, msg) {
 	if (!this.data_fn.get(what))
 	    this.data_fn.set(what, new functionCell({'sauron': this}));
-	return this.data_fn.get(what).getFn()(this.data.get(what), 'ask', msg);
+	return this.data_fn.get(what).getFn('primary')(this.data.get(what), 'ask', msg);
     };
 
     // TODO: load

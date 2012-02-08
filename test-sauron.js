@@ -33,7 +33,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 
         'if red is red, red is blue': function (base) {
 	    base.say('red', 'red');
-	    base.say('red', 'function anon_fn(y, x) { if ((y == \'ask\') && (x == \'red\')) { return \'blue\'; } else { return x; } }', true);
+	    base.say('red', 'function anon_fn(x, y) { if ((y == \'ask\') && (x == \'red\')) { return \'blue\'; } else { return x; } }', 'primary');
             assert.equal (base.ask('red'), 'blue');
         }
     },
@@ -56,7 +56,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 
         '"fruit" and "red", set "apple", but event returning "coconut" if its an apple': function (base) {
 	    base.say(['fruit', 'red'], 'apple');
-	    base.say(['fruit', 'red'], 'function anon_fn(y, x) { if (x === \'apple\') { return \'coconut\'; } else { return x; } }', true);
+	    base.say(['fruit', 'red'], 'function anon_fn(x, y) { if (x === \'apple\') { return \'coconut\'; } else { return x; } }', 'primary');
             assert.equal (base.ask(['fruit', 'red']), 'coconut');
         }
     },
@@ -64,7 +64,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
         topic: new(sauron.base),
 
         'when asked for "Osvaldo", let "Taylor" know about it': function (base) {
-    	    base.say(['osvaldo'], 'function anon_fn(y, x) { sauron.say(["taylor", "about", "osvaldo"], "ok"); }', true);
+    	    base.say(['osvaldo'], 'function anon_fn(x, y) { sauron.say(["taylor", "about", "osvaldo"], "ok"); }', 'primary');
 	    assert.equal (base.ask(['taylor', 'about', 'osvaldo'], undefined));
 	    base.ask(['osvaldo']);
 	    assert.equal (base.ask(['taylor', 'about', 'osvaldo']), 'ok');
@@ -75,7 +75,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 
         'when asked for "orange", let "Manuel" know who wants and how many': function (base) {
     	    base.say(['fruits', 'orange'], 
-		     'function anon_fn(action, x) { '
+		     'function anon_fn(x, action) { '
 		     + 'var value = (function (who_needs) {'
 		     + '    if (who_needs) '
 		     + '        return who_needs + \',\' + x; '
@@ -83,7 +83,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
 		     + '        return x;})(sauron.ask(["fruits", "Manuel", "orange"]));'
 		     + 'sauron.say(["fruits", "Manuel", "orange"], value); '
 		     + 'return value;}', 
-		     true);
+		     'primary');
 	    assert.equal (base.ask(['fruits', 'Manuel', 'orange']), undefined);
 	    base.say(['fruits', 'orange'], '(jack, 5)');
 	    assert.equal (base.ask(['fruits', 'Manuel', 'orange']), '(jack, 5)');
@@ -145,7 +145,7 @@ vows.describe('The Eye Who Sees Everything').addBatch({
     	topic: new(sauron.base),
     	'Using the sauron generic base' : {
     	    topic: function (base) {
-    		base.say('8', 'function square (act, x) { return x*x; }', true);
+    		base.say('8', 'function square (x, act) { return x*x; }', 'primary');
     		return base;
     	    },
     	    'When "8" has an event': {
