@@ -8,10 +8,11 @@
 var chaosHash = require('./chaosHash').chaosHash;
 var JSON = require('JSON');
 var fs = require('fs');
+var hashish = require('hashish');
 
 var functionCell = function(context) {
     this.context = context; // shall be {'sauron': this}
-    this.cell = [null, ['function (x, action, oldValue) { return x; }']];
+    this.cell = [null, ['function (x, action, value) { return x; }']];
 
     this.getCodes = function() { return this.cell[1]; };
     this.generateFn = function(code) {
@@ -63,7 +64,7 @@ var parse_data_fn = function(this_sauron, data) {
 		    codes = data._value;
 		    res._value = new functionCell({'sauron': this_sauron});
 		    for (var _k in codes) if (codes.hasOwnProperty(_k)) {
-			if (codes[_k] != 'function (x, action, oldValue) { return x; }')
+			if (codes[_k] != 'function (x, action, value) { return x; }')
 			    res._value.addCode(codes[_k]);
 		    }
 		}
@@ -104,18 +105,18 @@ var base = function() {
 	}
     };
 
-    this.dataToJSON() = function () {
+    this.dataToJSON = function () {
 	// TODO
     };
 
-    this.dataFnToJSON() = function () {
+    this.dataFnToJSON = function () {
 	// TODO
     };
 
-    this.ask = function(what) {
+    this.ask = function(what, msg) {
 	if (!this.data_fn.get(what))
 	    this.data_fn.set(what, new functionCell({'sauron': this}));
-	return this.data_fn.get(what).getFn()(this.data.get(what), 'ask');
+	return this.data_fn.get(what).getFn()(this.data.get(what), 'ask', msg);
     };
 
     // TODO: load

@@ -2,7 +2,7 @@
   "author": "Fausto Luiz Santin <fawxtin@gmail.com>",
   "name": "sauron-js",
   "description": "An event driven database",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "git@github.com:fawxtin/sauron-js.git"
@@ -14,7 +14,8 @@
     "node": "~0.6.7"
   },
   "dependencies": {
-    "JSON": ">= 0.0.1"
+    "JSON": ">= 0.0.1",
+    "hashish": ">= 0.0.1"
   },
   "devDependencies": {},
   "optionalDependencies": {}
